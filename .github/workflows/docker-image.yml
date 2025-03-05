@@ -1,0 +1,53 @@
+name: Deploy Spring Boot to Amazon ECR
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AWS_REGION: us-west-2
+  ECR_REPOSITORY: week4ecr
+  JAVA_VERSION: 21
+
+jobs:
+  deploy:
+    name: Deploy to ECR
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        cache: 'maven'
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        FULL_NAME: kwasisakyibaidoo_springbootdemo # REPLACE THIS with your actual full name
+      run: |
+        # Build the image with two tags
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$FULL_NAME .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        
+        # Push both tags
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$FULL_NAME
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
