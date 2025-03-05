@@ -44,7 +44,6 @@ jobs:
 
     - name: Build, tag, and push image to Amazon ECR
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         FULL_NAME: kwasisakyibaidoo_springbootdemo # REPLACE THIS with your actual full name
       run: |
         # Build the image with two tags
