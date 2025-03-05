@@ -7,6 +7,7 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: week4ecr
+  ECR_REGISTRY: public.ecr.aws/e2h5u6h2
   JAVA_VERSION: 21
 
 jobs:
