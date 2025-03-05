@@ -20,8 +20,8 @@ COPY src ./src
 # Build the application
 RUN ./mvnw package -DskipTests
 
-# Copy the built jar file
-COPY target/*.jar app.jar
+# Find the JAR file and copy it
+RUN find target -name "*.jar" -print0 | xargs -0 -I {} cp {} app.jar
 
 # Expose the port the app runs on
 EXPOSE 8080
